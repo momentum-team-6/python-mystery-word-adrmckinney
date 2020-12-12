@@ -1,5 +1,20 @@
+# User prompt to chose between memory game or number guess
+# game_choice = input("Select which game you would like to play, Mystery Word or Guess the Number | ")
+
+# if game_choice == "Mystery Word":
+#     mystery_word()
+# if game_choice == "Guess the Number":
+#     pass
+
+
+# Function start for memory game
+# def mystery_word(Mystery_Word):
+    # start_mystery_game = open('words.txt', 'r')
+    # opened_file = start_mystery_game.read()
+    
 file = open('words.txt', 'r')
 opened_file = file.read()
+
 
 upper_list = opened_file.upper().split()
 
@@ -15,7 +30,7 @@ for word in upper_list:
         medium_words.append(word)
     if len(word) >= 9 and len(word) <= 12:
         hard_words.append(word)
-    if len(word) >= 13 and len(word) <= 25:
+    if len(word) >= 6 and len(word) <= 25:
         demon_words.append(word)
 
 print("\U0001F600")
@@ -42,19 +57,40 @@ elif difficulty == "hard":
 elif difficulty == "demon":
     selected_list = demon_words
 
+# print('demon word', demon_words)
+
 import random
 computer_word = random.choice(selected_list)
+# computer_word = "ZOUNDS"
 computer_word_list = [letter for letter in computer_word]
 print('computer word is: ', computer_word)
 
+#------------------ code for demon words-------------------------
+# word families = words of the same length
+computer_word_length = len(computer_word_list)
+print('length', computer_word_length)
 
+# any word in demon_words that has the same length. Create a word_family list
+word_family = []
+
+# loop through demon_words, find their length, if length matches computer_word_length append it to word_family
+for word in demon_words:
+    demon_word_length = len(word)
+    if len(word) == computer_word_length:
+        word_family.append(word)
+# print('word family', word_family)
+
+# With similar length demon words inside word_family, now I need to check when the user chooses a correct letter, find that letters index in the selected word, and compare the word_family list to that index value for that letter. 
+
+# All words that share that letter index value should be grouped into a new list. So just reset word_family and put the new list inside it.
+
+#------------------ code for demon words-------------------------   
 
 display_word = ['_' for letter in range(len(computer_word))]
 print(" ".join(display_word))
 
 positions = []
 max_guesses = 8
-tries = 0
 memory = []
 
 while computer_word_list != display_word and max_guesses > 0:
@@ -78,15 +114,24 @@ while computer_word_list != display_word and max_guesses > 0:
                 for position in positions:
                     display_word[position] = upper_guess
                     positions = []
-        print(f"Yes, {upper_guess} is in the word")
-        print(" ".join(display_word))
+        print("")
+        print("Used letters: ", " ".join(memory))
+        print("Word: ", " ".join(display_word))
+        print("")
     else:
         memory.append(upper_guess)
         max_guesses -= 1
+        print("")
         print(f"{upper_guess} is not in word. You have {max_guesses} guesses left")
+        print("Used letters: ", " ".join(memory))
+        print("Word: ", " ".join(display_word))
+        print("")
 
 
 if computer_word_list == display_word:
     print("\U0001F604 A WINNER IS YOU \U0001f600")
 else:
     print(f"\U0001F643 LOSER \U0001F923 The word was {computer_word}. Better luck next time")
+
+
+# build a second game inside this. Make a function for mystery game and a function for guess the number
