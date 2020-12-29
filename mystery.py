@@ -11,7 +11,9 @@
 # def mystery_word(Mystery_Word):
     # start_mystery_game = open('words.txt', 'r')
     # opened_file = start_mystery_game.read()
-    
+
+import random
+
 file = open('words.txt', 'r')
 opened_file = file.read()
 
@@ -36,6 +38,7 @@ for word in upper_list:
 print("\U0001F600")
 
 
+
 while True:
     difficulty = input('Choose your difficulty level: easy, medium, hard, or demon | ')
     if difficulty != "easy" and difficulty != "normal" and difficulty != "hard" and difficulty != "demon":
@@ -46,7 +49,7 @@ while True:
 
 print('difficult level is:', difficulty)
 
-
+demon_mode = False
 selected_list = None
 if difficulty == "easy":
     selected_list = easy_words
@@ -56,10 +59,11 @@ elif difficulty == "hard":
     selected_list = hard_words
 elif difficulty == "demon":
     selected_list = demon_words
+    demon_mode = True
 
 # print('demon word', demon_words)
 
-import random
+
 computer_word = random.choice(selected_list)
 # computer_word = "ZOUNDS"
 computer_word_list = [letter for letter in computer_word]
@@ -82,7 +86,14 @@ for word in demon_words:
 
 # With similar length demon words inside word_family, now I need to check when the user chooses a correct letter, find that letters index in the selected word, and compare the word_family list to that index value for that letter. 
 
-# All words that share that letter index value should be grouped into a new list. So just reset word_family and put the new list inside it.
+def generate_demon_list(letter_positions, word_length, word_family):
+    filtered_list = []
+    # filter all of the words in the word family that match the letter
+    # position
+
+
+
+# All words that share that letter index value should be grouped into a new list. So just reset word_family and put the new list inside it. Or maybe .remove ever word that is not that index point.
 
 #------------------ code for demon words-------------------------   
 
@@ -94,7 +105,9 @@ max_guesses = 8
 memory = []
 
 while computer_word_list != display_word and max_guesses > 0:
-    guess = input('Guess a letter: ')
+    game_display = "Guess a letter 👹: " if demon_mode else "Guess a letter: "
+
+    guess = input(game_display)
     upper_guess = guess.upper()
 
     if upper_guess == "":
