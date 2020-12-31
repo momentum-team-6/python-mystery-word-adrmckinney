@@ -27,7 +27,7 @@ class Game:
         if difficulty == "demon":
             setup_length = random.choice(range(6, 8))
         
-        cheat_mode = input("Are you a cheater? (y/n) ") == "y"
+        cheat_mode = input("Are you a cheater? (y/n) ").lower() == "y"
 
         if difficulty == "demon":
             return DemonWord(setup_length, cheat_mode)
@@ -59,7 +59,7 @@ class Game:
                 
                 print(f"\nYou have {self.turns_remaining} wrong guesses left\n")
                 print("\nmystery word: ", self.word.output())
-        
+
         if self.word.guessed_correctly():
             print("\nA WINNER IS YOU!")
             self.play_again()
@@ -87,7 +87,7 @@ class Word():
         
     def output(self):
         if self.cheat_mode:
-            print("Computer Word:", self.computer_word)
+            print("\nComputer Word:", self.computer_word)
 
 
         output = []
@@ -135,18 +135,21 @@ class DemonWord(Word):
         self.demon_dict = {}
         self.demon_word_list = self.list_of_same_length_words()
         self.letter_filters = []
+        self.word_memory = []
 
     def output(self):
         if self.cheat_mode:
             print(f"demon word list has {len(self.demon_word_list)} words\n")
             print(self.demon_word_list[:10])
-            print(self.positions)
+            print("positions: ", self.positions)
+            print("letter filters: ", self.letter_filters)
+            print("Words the computer has selected: ", self.word_memory)
             # print("Letter filters ", self.letter_filters)
             # print("longest word family: ", len(longest_word_family))
 
-        return f"👹 {super().output()}"  #super is the super class, the Game, I'm saying return whatever is normally returned in Game with the addition of my cool emoji.
+        return f"👹 {super().output()}"  #super is the super class, Word, I'm saying return whatever is normally returned in Word with the addition of my cool emoji.
 
-    def remove_words(self):
+    def remove_words_wrong_guess(self):
         unfiltered_words = []
 
         for word in self.demon_word_list:
@@ -162,10 +165,45 @@ class DemonWord(Word):
                 unfiltered_words.append(word)
 
         self.demon_word_list = unfiltered_words
-        self.computer_word = random.choice(self.demon_word_list)
+        # self.computer_word = random.choice(self.demon_word_list)
+        # self.word_memory.append(self.computer_word)
+    
+    def remove_words_correct_guess(self):
+        '''Old Code using dict positions'''
+        unfiltered_words = []
+
+        for word in self.demon_word_list:
+            if self.allow_word_for_positions(word):
+                unfiltered_words.append(word)
+
+        self.demon_word_list = unfiltered_words
+        '''Old Code using dict positions'''
+
+        '''New code comparing against output to remove words'''
+        # unfiltered_words = []
+
+        # for position in range(len(self.output())):
+        #     for word in self.demon_word_list:
+        #         for letter in word[position]:
+        #             if letter == self.output()[position]:
+        #                 unfiltered_words.append(word)
+        
+        # self.demon_word_list = unfiltered_words
+        
+
+    def allow_word_for_positions(self, word):
+        if len(self.positions) == 0:
+            return True
+        include_word = True
+
+        for position in self.positions:
+                comparison_letter = self.positions[position]
+                if word[position] != comparison_letter:
+                    include_word = False
+        return include_word
 
     def guess(self, guessed_letter):
-
+        self.word_memory.append(self.computer_word)
         if guessed_letter in list(self.computer_word):
             word_families = {}
             
@@ -174,7 +212,7 @@ class DemonWord(Word):
                 words_for_position = []
                 for word in self.demon_word_list:
                     letter = word[position]
-                    if letter == guessed_letter:
+                    if letter == guessed_letter and self.allow_word_for_positions(word):
                         words_for_position.append(word)
                 word_families[position] = words_for_position
             
@@ -185,16 +223,17 @@ class DemonWord(Word):
                 
             self.computer_word = random.choice(longest_word_family)
             self.demon_word_list = longest_word_family
+            ''' remove words with guessed letter from demon word list '''
+
+            self.remove_words_correct_guess()
 
         else:
             # print(f"{guessed_letter} is not in the word.", guessed_letter)
             self.letter_filters.append(guessed_letter)
-            self.remove_words()
+            self.remove_words_wrong_guess()
 
         
         return super().guess(guessed_letter)
         
-
-
 new_game = Game()
 new_game.play()
